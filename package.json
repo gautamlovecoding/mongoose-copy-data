@@ -1,0 +1,17 @@
+{
+  "name": "mongoose-copy-data",
+  "version": "1.0.0",
+  "description": "A utility for copying data between MongoDB collections using Mongoose",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mongoose",
+    "mongodb",
+    "data copy",
+    "utility"
+  ],
+  "author": "Gautam kumar",
+  "license": "MIT"
+}
