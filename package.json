@@ -1,10 +1,10 @@
 {
   "name": "mongoose-copy-data",
-  "version": "1.0.0",
-  "description": "A utility for copying data between MongoDB collections using Mongoose",
+  "version": "2.0.0",
+  "description": "A utility for copying data between MongoDB collections using Mongoose inside terminal only",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --no-warnings index.js"
   },
   "keywords": [
     "mongoose",
@@ -13,5 +13,11 @@
     "utility"
   ],
   "author": "Gautam kumar",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.10",
+    "mongoose": "^5.9.9",
+    "ora": "^7.0.1"
+  },
+  "type": "module"
 }
