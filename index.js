@@ -6,7 +6,7 @@ import ora from 'ora';
 import { program } from 'commander';
 
 program
-  .version('1.2.0')
+  .version('2.0.0')
   .description('Database Copy Utility')
   .option('-s, --source <source>', 'Source database connection string')
   .option('-t, --target <target>', 'Target database connection string')
