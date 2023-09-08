@@ -68,9 +68,6 @@ The Database Copy Utility supports the following command-line options:
 
 6. Once the data copy is complete, the tool will display a success message for each copied collection.
 
-## Version
-
-The current version of the Database Copy Utility is 2.0.0.
 
 ## Dependencies
 
