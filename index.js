@@ -6,7 +6,7 @@ import ora from 'ora';
 import { program } from 'commander';
 
 program
-  .version('2.1.0')
+  .version('2.2.0')
   .description('Database Copy Utility')
   .option('-s, --source <source>', 'Source database connection string')
   .option('-t, --target <target>', 'Target database connection string')
@@ -121,18 +121,24 @@ async function connectAndCopyData() {
 
       const count = await SourceModel.countDocuments();
       const spinner = ora(`Copying data of ${collectionName} total documents: ${count}`).start();
-      await TargetModel.deleteMany();
-      let size = count;
-      if (count > 1000) size = Math.floor(size / 10);
-      if (count > 10000) size = Math.floor(size / 100);
-      else if (count > 100000) size = Math.floor(size / 1000);
-      for (let i = 0; i < count; i += size) {
-        spinner.text = `Copying ${i + size}/${count} documents ${Math.round((i + size) / count * 100)}% done`;
-        const dataToCopy = await SourceModel.find().skip(i).limit(size).lean();
-        await TargetModel.insertMany(dataToCopy.slice(i, i + size));
-      }
-      spinner.succeed(`Copied data collection named \x1b[33m${collectionName}\x1b[0m`);
 
+      try {
+        await TargetModel.deleteMany();
+        let size = count;
+        if (count > 1000) size = Math.floor(size / 10);
+        else if (count > 10000) size = Math.floor(size / 100);
+        else if (count > 100000) size = Math.floor(size / 1000);
+
+        for (let i = 0; i < count; i += size) {
+          spinner.text = `Copying ${i + size}/${count} documents ${Math.round((i + size) / count * 100)}% done`;
+          const dataToCopy = await SourceModel.find().skip(i).limit(size).lean();
+          await TargetModel.insertMany(dataToCopy);
+        }
+
+        spinner.succeed(`Copied data collection named \x1b[33m${collectionName}\x1b[0m`);
+      } catch (error) {
+        spinner.fail(`Error copying data for collection \x1b[33m${collectionName}\x1b[0m: ${error.message}`);
+      }
     }
     sourceDB.close();
     targetDB.close();
