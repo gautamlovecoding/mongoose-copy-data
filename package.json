@@ -12,12 +12,16 @@
     "data copy",
     "utility"
   ],
-  "author": "Gautam kumar",
+  "author": "Gautam Kumar",
   "license": "MIT",
   "dependencies": {
+    "commander": "^11.0.0",
     "inquirer": "^9.2.10",
     "mongoose": "^5.9.9",
     "ora": "^7.0.1"
+  },
+  "bin": {
+    "mongoose-copy-data": "index.js"
   },
   "type": "module"
 }
