@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import mongoose from 'mongoose';
 import inquirer from 'inquirer';
 import ora from 'ora';
