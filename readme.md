@@ -37,7 +37,7 @@ Before using this tool, ensure that you have the following prerequisites install
 You can install the Database Copy Utility globally using npm:
 
 ```bash
-  npm install -g database-copy-utility
+  npm install -g mongoose-copy-data
 ```
 
 ## Running the Tool
@@ -45,7 +45,7 @@ You can install the Database Copy Utility globally using npm:
 Once installed, you can run the tool in your terminal as follows:
 
 ```bash
-database-copy-utility
+mongoose-copy-data
 ```
 
 ## Options
