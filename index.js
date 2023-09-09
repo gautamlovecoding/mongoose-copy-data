@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import inquirer from 'inquirer';
 import ora from 'ora';
 import { program } from 'commander';
+import figlet from 'figlet';
 
 program
   .version('2.2.0')
@@ -21,6 +22,15 @@ async function connectAndCopyData() {
 
   try {
     console.clear();
+
+    console.log(
+      figlet.textSync('Database Copy Utility', {
+        font: 'Doom',
+        horizontalLayout: 'fitted',
+        verticalLayout: 'fitted',
+        whitespaceBreak: true,
+      })
+    );
     console.log('🚀 Welcome to the Database Copy Utility 🚀\n');
 
     const getConnection = async (message) => {
@@ -78,7 +88,18 @@ async function connectAndCopyData() {
       },
     ]);
 
-    if (isAllCollection !== 'All') {
+    if (isAllCollection === 'All') {
+      const { excludeCollections } = await inquirer.prompt([
+        {
+          type: 'checkbox',
+          name: 'excludeCollections',
+          message: 'Please Select Collections If You Want To Exclude Otherwise Type Enter',
+          choices: collectionsToCopy,
+        },
+      ]);
+
+      collectionsToCopy = collectionsToCopy.filter(collection => !excludeCollections.includes(collection));
+    } else {
       const { specifiedCollections } = await inquirer.prompt([
         {
           type: 'checkbox',
@@ -128,10 +149,15 @@ async function connectAndCopyData() {
         if (count > 1000) size = Math.floor(size / 10);
         else if (count > 10000) size = Math.floor(size / 100);
         else if (count > 100000) size = Math.floor(size / 1000);
+        let downloadedSize = 0;
 
         for (let i = 0; i < count; i += size) {
-          spinner.text = `Copying ${i + size}/${count} documents ${Math.round((i + size) / count * 100)}% done`;
           const dataToCopy = await SourceModel.find().skip(i).limit(size).lean();
+          const dataSize = JSON.stringify(dataToCopy).length;
+
+          downloadedSize += dataSize;
+          spinner.text = `Copying ${i + size}/${count} documents ${Math.round((i + size) / count * 100)}% done (${formatBytes(downloadedSize)} Uploaded...)`;
+
           await TargetModel.insertMany(dataToCopy);
         }
 
@@ -146,6 +172,16 @@ async function connectAndCopyData() {
     console.error('\x1b[31mError:', error.message, '\x1b[0m');
     process.exit(1);
   }
+}
+// Function to format bytes for display
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 connectAndCopyData();
