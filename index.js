@@ -2,8 +2,8 @@
 
 import mongoose from 'mongoose';
 import inquirer from 'inquirer';
-import ora from 'ora';
 import { program } from 'commander';
+import { SingleBar } from 'cli-progress';
 import figlet from 'figlet';
 
 program
@@ -12,6 +12,14 @@ program
   .option('-s, --source <source>', 'Source database connection string')
   .option('-t, --target <target>', 'Target database connection string')
   .parse(process.argv);
+
+// Define a custom progress bar style
+const customProgressBarStyle = {
+  format: 'Copying {collectionName} [{bar}] {percentage}% | {value}/{total} | {downloaded} | ETA: {eta_formatted}',
+  barCompleteChar: '\u2588',
+  barIncompleteChar: '\u2591',
+  hideCursor: true,
+};
 
 async function connectAndCopyData() {
   const options = {
@@ -70,7 +78,7 @@ async function connectAndCopyData() {
           }
         }
       }
-    };
+    }
 
     const sourceDB = await getConnection('Enter source database connection string:');
     const targetDB = await getConnection('Enter target database connection string:\n');
@@ -133,15 +141,18 @@ async function connectAndCopyData() {
     }
     console.log('\x1b[32m\nAgreed..\x1b[0m');
 
+    const startTime = Date.now(); // Record start time
+
     for (const collectionName of collectionsToCopy) {
       const sourceSchema = new mongoose.Schema({}, { strict: false });
       const targetSchema = new mongoose.Schema({}, { strict: false });
-
+    
       const SourceModel = sourceDB.model(collectionName, sourceSchema);
       const TargetModel = targetDB.model(collectionName, targetSchema);
-
+    
       const count = await SourceModel.countDocuments();
-      const spinner = ora(`Copying data of ${collectionName} total documents: ${count}`).start();
+      console.log("\n")
+      const bar = new SingleBar(customProgressBarStyle); // Use the custom style
 
       try {
         await TargetModel.deleteMany();
@@ -150,22 +161,39 @@ async function connectAndCopyData() {
         else if (count > 10000) size = Math.floor(size / 100);
         else if (count > 100000) size = Math.floor(size / 1000);
         let downloadedSize = 0;
-
-        for (let i = 0; i < count; i += size) {
-          const dataToCopy = await SourceModel.find().skip(i).limit(size).lean();
+    
+        bar.start(count, 0, { collectionName, downloaded: formatBytes(downloadedSize) });
+    
+        let processedDocuments = 0; // Track processed documents
+    
+        while (processedDocuments < count) {
+          const dataToCopy = await SourceModel.find().skip(processedDocuments).limit(size).lean();
           const dataSize = JSON.stringify(dataToCopy).length;
-
+    
           downloadedSize += dataSize;
-          spinner.text = `Copying ${i + size}/${count} documents ${Math.round((i + size) / count * 100)}% done (${formatBytes(downloadedSize)} Uploaded...)`;
-
+          processedDocuments += dataToCopy.length;
+    
+          const progress = (processedDocuments / count) * 100;
+          bar.update(processedDocuments, { collectionName, downloaded: formatBytes(downloadedSize), progress: Math.round(progress) });
+    
           await TargetModel.insertMany(dataToCopy);
         }
-
-        spinner.succeed(`Copied data collection named \x1b[33m${collectionName}\x1b[0m`);
+    
+        bar.stop();
+        console.log(`Copied data collection named \x1b[33m${collectionName}\x1b[0m`);
       } catch (error) {
-        spinner.fail(`Error copying data for collection \x1b[33m${collectionName}\x1b[0m: ${error.message}`);
+        bar.stop();
+        console.error(`Error copying data for collection \x1b[33m${collectionName}\x1b[0m: ${error.message}`);
       }
     }
+
+    const endTime = Date.now(); // Record end time
+    const totalTimeInSeconds = (endTime - startTime) / 1000;
+    console.log(`\nTotal time taken: \x1b[34m${totalTimeInSeconds.toFixed(2)} seconds\x1b[0m`);
+    console.log(
+      `\n\x1b[35m🔥🔥🔥 Wooh... All Data Copied Successfully With Database-Copy-Utility CLI Tool. 🔥🔥🔥\x1b[0m \n\x1b[36m\x1b[33m\x1b[1mAuthor\x1b[0m:- \x1b[1;34mGautam Kumar👨‍💻\x1b[0m \x1b[33m\x1b[1memail\x1b[0m: \x1b[34mgautamku1111@gmail.com📧\x1b[0m`
+    );
+    
     sourceDB.close();
     targetDB.close();
   } catch (error) {

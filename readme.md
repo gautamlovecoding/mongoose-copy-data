@@ -7,7 +7,6 @@ A utility package for copying data between MongoDB collections using Mongoose.
 ## Table of Contents
 
 - [Overview](#overview)
-- [Usage](#usage)
 - [Installation](#installation)
 - [Running the Tool](#running-the-tool)
 - [Options](#options)
@@ -48,25 +47,20 @@ Once installed, you can run the tool in your terminal as follows:
 mongoose-copy-data
 ```
 
-## Options
-
-The Database Copy Utility supports the following command-line options:
-
-- `"-s, --source <source>"`: Specify the source database connection string.
-- `"-t, --target <target>"`: Specify the target database connection string.
-
 ## Usage Steps
 1. When you run the tool, it will prompt you to enter the source and target database connection strings.
 
 2. After successfully connecting to both databases, you can choose whether to copy all collections or select specific collections to copy.
 
-3. If you choose to copy specific collections, you will be presented with a list of available collections to choose from.
+3. If you choose the all collections, You will be presented with a list available collection to exclude the collections if you want. if you want to copy whole collection then press enter.
 
-4. The tool will confirm your selections before proceeding with the data copy.
+4. If you choose to copy specific collections, you will be presented with a list of available collections to choose from.
 
-5. It will then copy the selected data from the source database to the target database, providing progress updates along the way.
+5. The tool will confirm your selections before proceeding with the data copy.
 
-6. Once the data copy is complete, the tool will display a success message for each copied collection.
+6. It will then copy the selected data from the source database to the target database, providing progress updates along the way. Additionally, you can view the uploaded document's size and a progress bar.
+
+7. Once the data copy is complete, the tool will display a success message for each copied collection.
 
 
 ## Dependencies
@@ -76,12 +70,16 @@ The tool relies on several Node.js packages for its functionality:
 - [mongoose](https://www.npmjs.com/package/mongoose) : MongoDB object modeling for Node.js.
 
 - [inquirer](https://www.npmjs.com/package/inquirer) : A collection of common interactive command-line user interfaces.
-- [ora](https://www.npmjs.com/package/ora) : Elegant terminal spinner.
+
+- [cli-progress](https://www.npmjs.com/package/cli-progress) : easy to use progress-bar for command-line/terminal applications.
+
+- [figlet](https://www.npmjs.com/package/figlet) : Creates ASCII Art from text.
 
 
 ## Configuration
 
-- Before using this package, make sure to configure the following environment variables:
+ Before using this package, make sure to configure the following environment variables:
+
 - **SOURCEDATABASE**: Connection URL for the source MongoDB database.
 - **DESTINATIONDATABASE**: Connection URL for the target MongoDB database.
 
