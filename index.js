@@ -7,7 +7,7 @@ import { SingleBar } from 'cli-progress';
 import figlet from 'figlet';
 
 program
-  .version('2.4.0')
+  .version('2.5.0')
   .description('Database Copy Utility')
   .option('-s, --source <source>', 'Source database connection string')
   .option('-t, --target <target>', 'Target database connection string')

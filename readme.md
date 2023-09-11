@@ -10,6 +10,7 @@ A utility package for copying data between MongoDB collections using Mongoose.
 - [Installation](#installation)
 - [Running the Tool](#running-the-tool)
 - [Options](#options)
+- [Important Notice](#important-notice)
 - [Usage Steps](#usage-steps)
 - [Version](#version)
 - [Dependencies](#dependencies)
@@ -20,8 +21,6 @@ A utility package for copying data between MongoDB collections using Mongoose.
 ## Overview
 
 The Database Copy Utility is a command-line interface (CLI) tool designed to facilitate the copying of data between two MongoDB databases. This tool allows users to specify source and target database connection strings and select specific collections to copy. It handles the connection to both databases, provides options for selecting collections, and copies data efficiently.
-
-## Usage
 
 ### Prerequisites
 
@@ -46,6 +45,14 @@ Once installed, you can run the tool in your terminal as follows:
 ```bash
 mongoose-copy-data
 ```
+## Important Notice
+```vbnet
+1. First, it will delete all data from the target collections you have selected, and then it will copy all the data into the target database.
+ 
+2. It will not make any changes to the collections in the source database.
+```
+
+
 
 ## Usage Steps
 1. When you run the tool, it will prompt you to enter the source and target database connection strings.
