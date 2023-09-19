@@ -147,15 +147,16 @@ async function connectAndCopyData() {
     for (const collectionName of collectionsToCopy) {
       const sourceSchema = new mongoose.Schema({}, { strict: false });
       const targetSchema = new mongoose.Schema({}, { strict: false });
-    
+
       const SourceModel = sourceDB.model(collectionName, sourceSchema);
       const TargetModel = targetDB.model(collectionName, targetSchema);
-    
-      const count = await SourceModel.countDocuments();
+
+      const count = await SourceModel.estimatedDocumentCount();
       console.log("\n")
       const bar = new SingleBar(customProgressBarStyle); // Use the custom style
 
       const { avgObjSize = 0 } = await SourceModel.collection.stats();
+
       const { total_heap_size, used_heap_size } = v8.getHeapStatistics();
       const heap = total_heap_size - used_heap_size;
 
@@ -164,24 +165,24 @@ async function connectAndCopyData() {
       try {
         await TargetModel.deleteMany();
         let downloadedSize = 0;
-    
+
         bar.start(count, 0, { collectionName, downloaded: formatBytes(downloadedSize) });
-    
+
         let processedDocuments = 0; // Track processed documents
-    
+
         while (processedDocuments < count) {
           const dataToCopy = await SourceModel.find().skip(processedDocuments).limit(size).lean();
           const dataSize = JSON.stringify(dataToCopy).length;
-    
+
           downloadedSize += dataSize;
           processedDocuments += dataToCopy.length;
-    
+
           const progress = (processedDocuments / count) * 100;
           bar.update(processedDocuments, { collectionName, downloaded: formatBytes(downloadedSize), progress: Math.round(progress) });
-    
+
           await TargetModel.insertMany(dataToCopy);
         }
-    
+
         bar.stop();
         console.log(`Copied data collection named \x1b[33m${collectionName}\x1b[0m`);
       } catch (error) {
@@ -196,7 +197,7 @@ async function connectAndCopyData() {
     console.log(
       `\n\x1b[35m🔥🔥🔥 Wooh... All Data Copied Successfully With Database-Copy-Utility CLI Tool. 🔥🔥🔥\x1b[0m \n\x1b[36m\x1b[33m\x1b[1mAuthor\x1b[0m:- \x1b[1;34mGautam Kumar👨‍💻\x1b[0m \x1b[33m\x1b[1memail\x1b[0m: \x1b[34mgautamku1111@gmail.com📧\x1b[0m`
     );
-    
+
     sourceDB.close();
     targetDB.close();
   } catch (error) {
