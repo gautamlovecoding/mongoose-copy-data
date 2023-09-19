@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 import { program } from 'commander';
 import { SingleBar } from 'cli-progress';
 import figlet from 'figlet';
+import v8 from 'v8';
 
 program
   .version('2.5.0')
@@ -154,12 +155,14 @@ async function connectAndCopyData() {
       console.log("\n")
       const bar = new SingleBar(customProgressBarStyle); // Use the custom style
 
+      const { avgObjSize = 0 } = await SourceModel.collection.stats();
+      const { total_heap_size, used_heap_size } = v8.getHeapStatistics();
+      const heap = total_heap_size - used_heap_size;
+
+      const size = Math.floor(heap / avgObjSize * .70); // 70% capacity
+
       try {
         await TargetModel.deleteMany();
-        let size = count;
-        if (count > 1000) size = Math.floor(size / 10);
-        else if (count > 10000) size = Math.floor(size / 100);
-        else if (count > 100000) size = Math.floor(size / 1000);
         let downloadedSize = 0;
     
         bar.start(count, 0, { collectionName, downloaded: formatBytes(downloadedSize) });
