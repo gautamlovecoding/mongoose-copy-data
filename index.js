@@ -8,7 +8,7 @@ import figlet from 'figlet';
 import v8 from 'v8';
 
 program
-  .version('2.5.0')
+  .version('2.5.2')
   .description('Database Copy Utility')
   .option('-s, --source <source>', 'Source database connection string')
   .option('-t, --target <target>', 'Target database connection string')
@@ -145,6 +145,7 @@ async function connectAndCopyData() {
     const startTime = Date.now(); // Record start time
 
     for (const collectionName of collectionsToCopy) {
+      mongoose.pluralize(null);
       const sourceSchema = new mongoose.Schema({}, { strict: false });
       const targetSchema = new mongoose.Schema({}, { strict: false });
 
