@@ -1,6 +1,6 @@
 {
   "name": "mongoose-copy-data",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "A utility for copying data between MongoDB collections using Mongoose inside terminal only",
   "main": "index.js",
   "scripts": {
